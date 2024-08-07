@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "First Tweet Finder",
+  "version": "1.0",
+  "description": "Find the first tweet of any Twitter user",
+  "permissions": ["tabs", "activeTab", "scripting", "webNavigation", "storage"],
+  "host_permissions": ["https://twitter.com/*", "https://x.com/*"],
+  "action": {
+    "default_icon": {
+      "32": "images/icon_32.png",
+      "48": "images/icon_48.png",
+      "128": "images/icon_128.png"
+    }
+  },
+  "icons": {
+    "32": "images/icon_32.png",
+    "48": "images/icon_48.png",
+    "128": "images/icon_128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://twitter.com/*", "https://x.com/*"],
+      "js": ["libs/dayjs.min.js", "content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html"],
+      "matches": ["https://twitter.com/*", "https://x.com/*"]
+    }
+  ]
+}
