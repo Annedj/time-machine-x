@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "First Tweet Finder",
+  "name": "Time Machine X",
   "version": "1.0",
-  "description": "Find the first tweet of any Twitter user",
+  "description": "Browse anyone timeline and see their tweets from the past.",
   "permissions": ["tabs", "activeTab", "scripting", "webNavigation", "storage"],
   "host_permissions": ["https://twitter.com/*", "https://x.com/*"],
   "action": {
@@ -22,15 +22,6 @@
       "matches": ["https://twitter.com/*", "https://x.com/*"],
       "js": ["libs/dayjs.min.js", "content.js"],
       "css": ["styles.css"]
-    }
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["sidebar.html"],
-      "matches": ["https://twitter.com/*", "https://x.com/*"]
     }
   ]
 }

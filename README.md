@@ -1,6 +1,6 @@
 # Time Machine for X
 
-A Chrome extension to view anyone's tweets history
+A Chrome extension to browse anyone timeline and see their tweets from the past.
 
 ## Description
 
@@ -18,4 +18,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 Contributions to this project are welcome. Feel free to open issues and submit pull requests.
 
-by Anne de Joly [@annedevj](https://x.com/annedevj) 
+by Anne de Joly [@annedevj](https://x.com/annedevj)
