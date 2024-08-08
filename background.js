@@ -2,29 +2,64 @@ let searchTabId = null;
 let currentSearchIndex = 0;
 let username = "";
 let joinDate = null;
+let tweetCounts = {};
 
-// chrome.runtime.onInstalled.addListener(() => {
-//   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   console.log("Message received in background script:", message);
+//   if (message.action === "checkTweetsExistence") {
+//     checkTweetsExistence(message.queries).then((results) => {
+//       chrome.tabs.sendMessage(sender.tab.id, {
+//         action: "tweetExistenceResults",
+//         results: results,
+//       });
+//       console.log("🚀 ~ results:", results);
+//     });
+//     return true; // Indicates we will send a response asynchronously
+//   }
 // });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Message received in background script:", message);
-  if (message.action === "startSearch") {
-    console.log(
-      "Starting search for user:",
-      message.username,
-      "with join date:",
-      message.joinDate
-    );
-
-    username = message.username;
-    joinDate = new Date(message.joinDate);
-    currentSearchIndex = 0;
-    searchTabId = sender.tab.id; // ici
-    console.log("🚀 ~ searchTabId:", searchTabId);
-    // performNextSearch();
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (
+    changeInfo.status === "complete" &&
+    tab.url &&
+    tab.url.includes("twitter.com")
+  ) {
+    chrome.tabs.sendMessage(tabId, {
+      action: "urlChanged",
+      url: tab.url,
+    });
   }
 });
+
+async function checkTweetsExistence(queries) {
+  let results = {};
+  for (let key in queries) {
+    const url = queries[key];
+    const count = await visitPageAndCountTweets(url);
+    results[key] = count;
+  }
+  return results;
+}
+
+async function visitPageAndCountTweets(url) {
+  return new Promise((resolve) => {
+    chrome.tabs.create({ url: url, active: false }, (tab) => {
+      chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+        if (tabId === tab.id && info.status === "complete") {
+          chrome.tabs.onUpdated.removeListener(listener);
+          chrome.tabs.sendMessage(
+            tabId,
+            { action: "countTweets" },
+            (response) => {
+              chrome.tabs.remove(tabId);
+              resolve(response.count);
+            }
+          );
+        }
+      });
+    });
+  });
+}
 
 function performNextSearch() {
   const searchRanges = [

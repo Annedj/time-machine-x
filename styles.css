@@ -1,22 +1,28 @@
 #first-tweet-sidebar {
   position: fixed;
-  top: 100px;
+  top: 0;
   right: 0;
-  width: 300px;
+  width: 320px;
   height: 100%;
-  background-color: transparent;
-  border-left: 1px solid #ccc;
+  background-color: #15202b;
+  border-left: 1px solid #38444d;
   padding: 20px;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  padding-left: 30px;
+  box-shadow: -5px 0 5px rgba(0, 0, 0, 0.2);
   z-index: 9999;
   display: none;
-  color: white;
+  color: #ffffff;
+  overflow-y: auto;
+  font-family: "ui-sans-serif", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-#first-tweet-button {
+#first-tweet-button,
+#close-button {
   position: fixed;
-  top: 60px;
-  right: 20px;
+  top: 10px;
+  right: 70px;
   z-index: 10000;
   background-color: #1da1f2;
   color: white;
@@ -25,33 +31,139 @@
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
-}
-
-#first-tweet-button:hover {
-  background-color: #0c85d0;
+  transition: background-color 0.3s ease;
+  font-family: "ui-sans-serif", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 #close-button {
-  position: fixed;
-  top: 60px;
+  top: 15px;
   right: 20px;
-  z-index: 10000;
-  color: white;
-  font-weight: bold;
+  display: none;
+}
+
+#first-tweet-button:hover,
+#close-button:hover {
+  background-color: #0c85d0;
+}
+
+#reset-button {
+  background: none;
+  padding: 0;
+  color: #1da1f2;
   border: none;
-  padding: 10px 10px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: bold;
-  display: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  font-family: "ui-sans-serif", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.header-container {
+  padding-right: 70px;
+}
+
+#main-header {
+  font-size: 1.45rem;
+  font-weight: 200;
+  margin-bottom: 20px;
+}
+
+.header {
+  font-size: 1.2rem;
+  font-weight: 200;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+#profile-info {
+  color: rgb(113, 118, 123);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
 }
 
 .year-header {
   cursor: pointer;
   font-weight: bold;
-  margin: 5px 0;
+  margin: 6px 0;
+  padding: 5px;
+  background-color: #192734;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.year-header:hover {
+  background-color: #22303c;
+}
+
+.months {
+  list-style-type: none;
+  border-left: 2px solid #1da1f2;
+  padding-left: 16px;
+  margin-left: 6px;
+  display: none;
+}
+
+.months.active {
+  display: block;
 }
 
 .month {
-  margin-left: 15px;
+  margin: 8px 0;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+}
+
+.month a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: block;
+  width: 100%;
+}
+
+.month a:hover,
+.month a.active {
+  color: #1da1f2;
+}
+
+.search-ranges {
+  margin-top: 20px;
+}
+
+#search-ranges-list {
+  list-style-type: none;
+  border-left: 2px solid #1da1f2;
+  padding-left: 16px;
+  margin-left: 6px;
+}
+
+#search-ranges-list li {
+  margin: 8px 0;
+}
+
+#search-ranges-list a {
+  color: #ffffff;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+#search-ranges-list a:hover,
+#search-ranges-list a.active {
+  color: #1da1f2;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  color: #ffffff !important;
 }

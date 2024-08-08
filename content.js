@@ -1,264 +1,384 @@
-function createSidebar() {
-  // Create and inject the sidebar
-  const sidebar = document.createElement("div");
-  sidebar.id = "first-tweet-sidebar";
-  sidebar.innerHTML =
-    '<h2>Click on a range to search for tweets from that time period</h2><div id="first-tweet-content"></div>';
-  document.body.appendChild(sidebar);
-  // Open sidebar if localStorage open value is true and if url is /search
-  localStorage.getItem("sidebarOpen") === "true" &&
-  window.location.pathname === "/search"
-    ? (sidebar.style.display = "block")
-    : (sidebar.style.display = "none");
-}
-
-// Toggle sidebar visibility
-function toggleSidebar() {
-  const sidebar = document.getElementById("first-tweet-sidebar");
-  if (sidebar.style.display === "block") {
-    sidebar.style.display = "none";
-    localStorage.setItem("sidebarOpen", "false");
-  } else {
-    sidebar.style.display = "block";
-    localStorage.setItem("sidebarOpen", "true");
+class TimeMachine {
+  constructor() {
+    console.log("Thanks for using the TimeMachine! 🚀");
+    console.log(
+      "You can follow me on X at @annedevj and tag me on your first ever tweets!"
+    );
+    this.username = null;
+    this.joinDate = null;
+    this.createSidebar();
+    this.createButtons();
   }
-}
 
-function fillSidebarWithYearAndMonthNames() {
-  const username = getUsername();
-  const joinDate = getJoinDate();
-  const sidebarContent = document.getElementById("first-tweet-content");
+  getUsername() {
+    if (this.username === undefined || this.username === null) {
+      this.username = this.computeUsername();
+    }
+    return this.username;
+  }
 
-  const currentYear = dayjs().year();
-  const joinYear = joinDate.get("year");
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  getJoinDate() {
+    if (this.joinDate === undefined || this.joinDate === null) {
+      this.joinDate = this.computeJoinDate();
+    }
+    return this.joinDate;
+  }
 
-  let yearsHtml = "";
-  for (let year = joinYear; year <= currentYear; year++) {
-    let monthsHtml = monthNames
-      .map((name, index) => {
-        let startMonth = dayjs(`${year}-${index + 1}-01`);
-        let endMonth = startMonth.endOf("month");
-        const url = constructSearchQuery(startMonth, endMonth);
+  computeUsername() {
+    const titleTag = document.querySelector("title");
+    if (titleTag) {
+      const titleText = titleTag.textContent;
+      const matchProfile = titleText.match(/@(\w+)/);
+      const matchSearch = titleText.match(/from:(\w+)\+since/);
 
-        return `<li class="month" ><a href="${url}" data-year="${year}" data-month="${index}">${name}</a></li>`;
-      })
-      .join("");
-    yearsHtml += `
-    <div class="year" data-year="${year}">
-      <div class=" header year-header">${year}</div>
-      <ul class="months" style="display: none;">
+      const match = matchProfile
+        ? matchProfile[1]
+        : matchSearch
+        ? matchSearch[1]
+        : null;
+
+      if (match) {
+        localStorage.setItem("username", match);
+        return match;
+      }
+    }
+    if (localStorage.getItem("username") !== null) {
+      return localStorage.getItem("username");
+    }
+
+    const usernameData = document.querySelector("#profile-info");
+
+    if (usernameData) {
+      return usernameData.getAttribute("data-username");
+    }
+    return null; // Return null if no valid handle is found
+  }
+
+  computeJoinDate() {
+    const joinDateElement = document.querySelector(
+      'span[data-testid="UserJoinDate"]'
+    );
+    if (joinDateElement) {
+      const joinDateText = joinDateElement.innerHTML;
+      const match = joinDateText.match(/Joined (\w+) (\d{4})/);
+      if (match) {
+        const month = match[1];
+        const year = match[2];
+        const joinDate = dayjs(Date.parse(`${month} 1, ${year}`));
+        localStorage.setItem("joinDate", joinDate);
+        return joinDate;
+      }
+    }
+    if (localStorage.getItem("joinDate") !== null) {
+      return dayjs(localStorage.getItem("joinDate"));
+    }
+    return null;
+  }
+
+  constructSearchQuery(startDate, endDate) {
+    const startDateString = startDate.format("YYYY-MM-DD");
+    const endDateString = endDate.format("YYYY-MM-DD");
+    const query = `from:${this.username}+since:${startDateString}+until:${endDateString}`;
+
+    return `https://x.com/search?q=${encodeURIComponent(
+      query
+    )}&src=typed_query&f=live`;
+  }
+
+  getTimeFromNow(date) {
+    const now = new Date();
+    const diff = now.valueOf() - date.valueOf();
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30.4375);
+    const years = Math.floor(days / 365.25);
+
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else if (days < 7) {
+      return `${days} days ago`;
+    } else if (weeks < 4) {
+      return `${weeks} weeks ago`;
+    } else if (months < 12) {
+      return `${months} months ago`;
+    } else {
+      return `${years} years ago`;
+    }
+  }
+
+  toggleSidebar() {
+    const isSidebarOpen = localStorage.getItem("sidebarOpen") === "true";
+
+    const isSearchOrProfilePage =
+      window.location.pathname === "/search" || this.getUsername() !== null;
+
+    if (isSidebarOpen && isSearchOrProfilePage) {
+      this.sidebar.style.display = "block";
+      this.openButton.style.display = "none";
+      this.closeButton.style.display = "block";
+    } else {
+      this.sidebar.style.display = "none";
+      this.openButton.style.display = "block";
+      this.closeButton.style.display = "none";
+    }
+
+    this.addInfoToSidebar();
+  }
+
+  createSidebar() {
+    const sidebar = document.createElement("div");
+    sidebar.id = "first-tweet-sidebar";
+    sidebar.innerHTML =
+      '<div class="header-container"><h2 id="main-header">Welcome to the time machine!</h2><div id="profile-info"></div></div><div id="first-tweet-content"></div>';
+    document.body.appendChild(sidebar);
+    this.sidebar = sidebar;
+
+    const sidebarContent = document.getElementById("first-tweet-content");
+    this.sidebarContent = sidebarContent;
+  }
+
+  createButtons() {
+    const button = document.createElement("button");
+    button.id = "first-tweet-button";
+    button.textContent = "Time Machine ⏳";
+    document.body.appendChild(button);
+    this.openButton = button;
+
+    const closeButton = document.createElement("button");
+    closeButton.id = "close-button";
+    closeButton.textContent = "X";
+    document.body.appendChild(closeButton);
+    this.closeButton = closeButton;
+
+    button.addEventListener("click", async () => {
+      localStorage.setItem("sidebarOpen", true);
+      this.toggleSidebar();
+    });
+
+    closeButton.addEventListener("click", () => {
+      localStorage.setItem("sidebarOpen", false);
+      this.toggleSidebar();
+    });
+
+    this.toggleSidebar();
+  }
+
+  addInfoToSidebar() {
+    this.appendProfileInfo();
+    this.fillSearchRanges();
+    this.fillSearchMonths();
+  }
+
+  appendProfileInfo() {
+    if (this.profileInfo === true) {
+      return;
+    }
+
+    const targetElement = document.getElementById("profile-info");
+
+    if (!this.username || !this.joinDate) {
+      targetElement.textContent =
+        "Unable to find a username or join date. Make sure you're on a profile page and try again.";
+      this.profileInfo = false;
+    } else {
+      targetElement.dataset.username = this.username;
+      targetElement.innerHTML = `<p>@${
+        this.username
+      }</p><p>Joined ${this.getTimeFromNow(this.joinDate)}</p>`;
+      this.profileInfo = true;
+    }
+
+    if (this.resetProfileButton) {
+      this.resetProfileButton.remove();
+      this.resetProfileButton = null;
+    }
+
+    const resetProfileButton = document.createElement("button");
+    resetProfileButton.id = "reset-button";
+    resetProfileButton.textContent = "Fetch profile again";
+    targetElement.insertAdjacentElement("afterend", resetProfileButton);
+
+    resetProfileButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetProfileButton.textContent = "Fetched!";
+      setTimeout(() => {
+        resetProfileButton.textContent = "Fetch profile again";
+      }, 2000);
+      this.reset();
+    });
+
+    this.resetProfileButton = resetProfileButton;
+  }
+
+  fillSearchRanges() {
+    if (this.searchRangesOptions || this.profileInfo === false) {
+      return;
+    }
+
+    const searchRangesOptionsData = [
+      { months: 1, name: "First month" },
+      { months: 3, name: "First 3 months" },
+      { months: 6, name: "First 6 months" },
+      { months: 12, name: "First year" },
+      { months: 24, name: "First 2 years" },
+      { months: 36, name: "First 3 years" },
+      { months: 60, name: "First 5 years" },
+      { months: null, name: "All time" },
+    ];
+
+    const searchRangesOptions = document.createElement("div");
+    searchRangesOptions.id = "search-ranges";
+    this.sidebarContent.appendChild(searchRangesOptions);
+    this.searchRangesOptions = searchRangesOptions;
+
+    this.searchRangesOptions.innerHTML +=
+      '<h3 class="header">Choose a time range to view tweets from:</h3>';
+
+    this.searchRangesOptions.innerHTML += `
+    <div class="search-ranges">
+      <ul id="search-ranges-list">
+        ${searchRangesOptionsData
+          .map((range) => {
+            let months = range.months;
+            let endDate = months
+              ? this.joinDate.add(parseInt(months), "month")
+              : dayjs();
+
+            if (endDate.isAfter(dayjs())) {
+              return;
+            }
+            let url = this.constructSearchQuery(this.joinDate, endDate);
+            let activeLink = url === window.location.href ? "active" : "";
+
+            return `
+          <li>
+            <a href="${url}" class="range-link ${activeLink}" data-months="${range.months}">${range.name}</a>
+          </li>
+        `;
+          })
+          .join("")}
+      </ul>
+    </div>
+  `;
+
+    // Add event listeners to range links
+    document.querySelectorAll(".range-link").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = e.target.href;
+      });
+    });
+  }
+
+  fillSearchMonths() {
+    if (this.searchMonthsOptions || this.profileInfo === false) {
+      return;
+    }
+
+    const searchMonthsOptions = document.createElement("div");
+    searchMonthsOptions.id = "search-months";
+    this.sidebarContent.appendChild(searchMonthsOptions);
+    this.searchMonthsOptions = searchMonthsOptions;
+
+    const currentYear = dayjs().year();
+    const joinYear = this.joinDate.get("year");
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    this.searchMonthsOptions.innerHTML +=
+      '<h3 class="header">Or pick a month to search for tweets from that month:</h3>';
+
+    let yearsHtml = "";
+    for (let year = joinYear; year <= currentYear; year++) {
+      let monthsHtml = monthNames
+        .map((name, index) => {
+          let startMonth = dayjs(`${year}-${index + 1}-01`);
+          let endMonth = startMonth.endOf("month");
+          const url = this.constructSearchQuery(startMonth, endMonth);
+
+          return `<li class="month"><a href="${url}" data-year="${year}" data-month="${index}">${name}</a></li>`;
+        })
+        .join("");
+      yearsHtml += `
+    <div>
+      <div class="year-header">${year}</div>
+      <ul class="months">
         ${monthsHtml}
       </ul>
     </div>
   `;
-  }
-  sidebarContent.innerHTML = yearsHtml;
-}
+    }
+    this.searchMonthsOptions.innerHTML += yearsHtml;
 
-function addEventListenersOnYearAndMonthNames() {
-  const yearHeaders = document.querySelectorAll(".year-header");
-  const monthDivs = document.querySelectorAll(".months");
+    const yearHeaders = document.querySelectorAll(".year-header");
+    const monthDivs = document.querySelectorAll(".months");
 
-  // Add event listeners for collapsing functionality
-  yearHeaders.forEach((header) => {
-    header.addEventListener("click", () => {
-      const monthDiv = header.nextElementSibling;
+    monthDivs.forEach((div) => {
+      div.style.display = "none";
+    });
 
-      monthDivs.forEach((div) => {
-        if (div !== monthDiv) {
-          div.style.display = "none";
-        } else if (monthDiv.style.display === "block") {
-          div.style.display = "none";
-        } else {
-          div.style.display = "block";
-        }
+    yearHeaders.forEach((header) => {
+      header.addEventListener("click", (_e) => {
+        const monthDiv = header.nextElementSibling;
+
+        monthDivs.forEach((div) => {
+          if (div !== monthDiv) {
+            div.style.display = "none";
+          }
+        });
+
+        monthDiv.style.display =
+          monthDiv.style.display === "block" ? "none" : "block";
       });
     });
-  });
-}
-
-function fillSidebarWithTimeRanges() {
-  const joinDate = getJoinDate();
-  const sidebarContent = document.getElementById("first-tweet-content");
-
-  const searchRanges = [
-    { months: 1, name: "First month" },
-    { months: 3, name: "First 3 months" },
-    { months: 6, name: "First 6 months" },
-    { months: 12, name: "First year" },
-    { months: 24, name: "First 2 years" },
-    { months: 36, name: "First 3 years" },
-    { months: 60, name: "First 5 years" },
-    { months: null, name: "All time" },
-  ];
-
-  sidebarContent.innerHTML += `
-    <div class="search-ranges">
-      <div class="header">By period</div>
-      <ul id="search-ranges-list">
-      </ul>
-    </div>
-  `;
-
-  const ulElement = document.getElementById("search-ranges-list");
-
-  searchRanges.forEach((range) => {
-    const link = document.createElement("a");
-    link.classList = link.textContent = range.name;
-    link.dataset.months = range.months; // Store the months value in a data attribute
-
-    console.log("🚀 ~ range.months:", range.months);
-    if (range.months === null) {
-      endDate = dayjs();
-    } else {
-      endDate = joinDate.add(range.months, "month");
-    }
-
-    const url = constructSearchQuery(joinDate, endDate);
-
-    link.href = url;
-
-    const liElement = document.createElement("li");
-    liElement.appendChild(link);
-
-    ulElement.appendChild(liElement);
-  });
-}
-
-function createLiMonthLink(year, month) {}
-
-// Get username from the title tag
-function getUsername() {
-  const titleTag = document.querySelector("title");
-  if (titleTag) {
-    const titleText = titleTag.textContent;
-    const match = titleText.match(/@(\w+)/);
-
-    if (match && match[1]) {
-      localStorage.setItem("username", match[1]);
-      return match[1];
-    } else if (localStorage.getItem("username") !== null) {
-      return localStorage.getItem("username");
-    }
   }
-  return null; // Return null if no valid handle is found
-}
 
-// Get join date from the profile page
-function getJoinDate() {
-  const joinDateElement = document.querySelector(
-    'span[data-testid="UserJoinDate"]'
-  );
-  if (joinDateElement) {
-    const joinDateText = joinDateElement.textContent;
-    const match = joinDateText.match(/Joined (\w+) (\d{4})/);
-    if (match) {
-      const month = match[1];
-      const year = match[2];
-      const joinDate = dayjs(Date.parse(`${month} 1, ${year}`));
-      localStorage.setItem("joinDate", joinDate);
-      return joinDate;
+  reset() {
+    localStorage.removeItem("username");
+    localStorage.removeItem("joinDate");
+    this.profileInfo = null;
+    this.username = null;
+    this.joinDate = null;
+    this.getUsername();
+    this.getJoinDate();
+    if (this.searchRangesOptions) {
+      this.searchRangesOptions.remove();
     }
-  } else if (localStorage.getItem("joinDate") !== null) {
-    return dayjs(localStorage.getItem("joinDate"));
-  }
-  return null;
-}
-
-// Main function to find first tweet
-function findFirstTweet() {
-  const username = getUsername();
-  const joinDate = getJoinDate();
-  console.log("🚀 ~ username:", username);
-  console.log("🚀 ~ joinDate:", joinDate);
-
-  if (username && joinDate) {
-    const sidebarContent = document.getElementById("first-tweet-content");
-    // sidebarContent.textContent = "Searching for first tweet...";
-
-    // chrome.runtime.sendMessage(
-    //   {
-    //     action: "startSearch",
-    //     username: username,
-    //     joinDate: joinDate.toISOString(),
-    //     additionalInfo: "Some additional info", // Add any additional info here
-    //   },
-    //   (response) => {
-    //     console.log("Response from background script:", response);
-    //   }
-    // );
-  } else {
-    alert(
-      "Unable to find username or join date. Make sure you're on a Twitter profile page."
-    );
+    this.searchRangesOptions = null;
+    if (this.searchMonthsOptions) {
+      this.searchMonthsOptions.remove();
+    }
+    this.searchMonthsOptions = null;
+    this.addInfoToSidebar();
   }
 }
 
-function constructUrlSearchQuery(startDate, endDate) {
-  const username = getUsername();
-
-  const startDateString = startDate.format("YYYY-MM-DD");
-  const endDateString = endDate.format("YYYY-MM-DD");
-  const query = `from:${username} since:${startDateString} until:${endDateString}`;
-
-  return `https://x.com/search?q=${encodeURIComponent(
-    query
-  )}&src=typed_query&f=live`;
-}
-
-// Create and inject the button
-async function createButtonAndCloseButton() {
-  const button = document.createElement("button");
-  button.id = "first-tweet-button";
-  button.textContent = "X Time Machine ⏳";
-  button.addEventListener("click", () => {
-    toggleSidebar();
-    fillSidebarWithYearAndMonthNames();
-    fillSidebarWithTimeRanges();
-    findFirstTweet();
-    button.style.display = "none";
-    closeButton.style.display = "block";
-  });
-  document.body.appendChild(button);
-
-  const closeButton = document.createElement("button");
-  closeButton.id = "close-button";
-  closeButton.textContent = "X";
-  closeButton.addEventListener("click", () => {
-    toggleSidebar();
-    button.style.display = "block";
-    closeButton.style.display = "none";
-  });
-  document.body.appendChild(closeButton);
-}
-
-// Initialize extension
-async function init() {
-  createSidebar();
-  createButtonAndCloseButton();
+function init() {
+  const timeMachine = new TimeMachine();
+  timeMachine.getUsername();
+  timeMachine.getJoinDate();
+  timeMachine.addInfoToSidebar();
 }
 
 // Run initialization when the page is fully loaded
 window.addEventListener("load", init);
-
-// Listen for messages from the background script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "searchComplete") {
-    const sidebarContent = document.getElementById("first-tweet-content");
-    sidebarContent.textContent = message.result;
-  }
-});
