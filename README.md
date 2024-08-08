@@ -1,10 +1,10 @@
 # Time Machine for X
 
-A Chrome extension to browse anyone timeline and see their tweets from the past.
+A Chrome extension to browse anyone's timeline and see their tweets from the past.
 
 ## Description
 
-The Time Machine is a Chrome extension with a simple, intuitive interface allowing you to browse anyone tweets history, by time period since they joined or by month since they joined the platform.
+The Time Machine is a Chrome extension with a simple, intuitive interface allowing you to browse anyone's tweet history, by period since they joined or by month since they joined the platform.
 
 <img width="1600" alt="Screenshot 2024-08-08 at 16 00 54" src="https://github.com/user-attachments/assets/26820507-587f-4041-bdad-ace0e81a0d2b">
 <img width="1600" alt="Screenshot 2024-08-08 at 16 01 02" src="https://github.com/user-attachments/assets/88447a82-fa1e-44d8-a4a2-5f2099b24c4a">
