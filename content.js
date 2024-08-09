@@ -8,10 +8,10 @@ class TimeMachine {
     this.joinDate = null;
     this.createSidebar();
     this.createButtons();
+    this.setupPageChangeListeners();
   }
 
   getUsername() {
-    console.log("get");
     if (this.username === undefined || this.username === null) {
       this.username = this.computeUsername();
     }
@@ -26,7 +26,6 @@ class TimeMachine {
   }
 
   computeUsername() {
-    console.log("compute");
     const titleTag = document.querySelector("title");
     if (titleTag) {
       const titleText = titleTag.textContent;
@@ -379,6 +378,32 @@ class TimeMachine {
     }
   }
 
+  setupPageChangeListeners() {
+    // Listen for changes in the URL
+    let lastUrl = location.href;
+    new MutationObserver(() => {
+      const url = location.href;
+      if (url !== lastUrl) {
+        lastUrl = url;
+        this.onPageChange();
+      }
+    }).observe(document, { subtree: true, childList: true });
+
+    // Listen for clicks on profile links
+    document.addEventListener("click", (event) => {
+      const profileLink = event.target.closest('a[href^="/"]');
+      if (profileLink && profileLink.getAttribute("href").match(/^\/\w+$/)) {
+        // Wait for the page to load
+        setTimeout(() => this.onPageChange(), 1000);
+      }
+    });
+  }
+
+  onPageChange() {
+    console.log("Page changed, resetting TimeMachine");
+    this.reset();
+  }
+
   reset() {
     localStorage.removeItem("username");
     localStorage.removeItem("joinDate");
@@ -396,6 +421,7 @@ class TimeMachine {
     }
     this.searchMonthsOptions = null;
     this.addInfoToSidebar();
+    this.toggleSidebar(); // Ensure sidebar visibility is updated
   }
 }
 

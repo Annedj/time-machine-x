@@ -1,6 +1,6 @@
 # Time Machine for X
 
-A Chrome extension to browse anyone timeline and see their tweets from the past.
+A Chrome extension to browse anyone's timeline and see their tweets from the past.
 
 ## Description
 
