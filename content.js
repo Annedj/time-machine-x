@@ -11,6 +11,7 @@ class TimeMachine {
   }
 
   getUsername() {
+    console.log("get");
     if (this.username === undefined || this.username === null) {
       this.username = this.computeUsername();
     }
@@ -25,6 +26,7 @@ class TimeMachine {
   }
 
   computeUsername() {
+    console.log("compute");
     const titleTag = document.querySelector("title");
     if (titleTag) {
       const titleText = titleTag.textContent;
@@ -322,7 +324,7 @@ class TimeMachine {
       yearsHtml += `
     <div>
       <div class="year-header">${year}</div>
-      <ul class="months">
+      <ul class="months" data-year="${year}">
         ${monthsHtml}
       </ul>
     </div>
@@ -351,6 +353,30 @@ class TimeMachine {
           monthDiv.style.display === "block" ? "none" : "block";
       });
     });
+
+    setTimeout(() => {
+      this.openActiveYear(monthDivs);
+    }, 400);
+  }
+
+  openActiveYear(monthDivs) {
+    let activeSearchYear = null;
+    const titleTag = document.querySelector("title");
+    if (titleTag) {
+      const titleText = titleTag.textContent;
+      const matchSearch = titleText.match(/since:(\d{4})\S+until:(\d{4})/);
+      if (matchSearch && matchSearch[1] === matchSearch[2]) {
+        activeSearchYear = matchSearch[1];
+      }
+    }
+
+    const matchingDiv = Array.from(monthDivs).find(
+      (div) => div.dataset.year === activeSearchYear
+    );
+
+    if (activeSearchYear && matchingDiv) {
+      matchingDiv.style.display = "block";
+    }
   }
 
   reset() {
