@@ -18,6 +18,23 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+#first-tweet-content {
+  padding-bottom: 80px;
+}
+
+#about-me {
+  content: "by @annedevj";
+  display: inline-block;
+  color: rgb(113, 118, 123);
+  font-size: 0.9rem;
+  margin: 30px 0 20px 0;
+  text-decoration: none;
+}
+
+#about-me a:hover {
+  text-decoration: none;
+}
+
 #first-tweet-button,
 #close-button {
   position: fixed;

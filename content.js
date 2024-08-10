@@ -176,6 +176,7 @@ class TimeMachine {
     this.appendProfileInfo();
     this.fillSearchRanges();
     this.fillSearchMonths();
+    this.fillAboutMe();
   }
 
   appendProfileInfo() {
@@ -358,6 +359,20 @@ class TimeMachine {
     }, 400);
   }
 
+  fillAboutMe() {
+    if (!this.searchMonthsOptions || this.aboutMeLink) {
+      return;
+    }
+
+    const aboutMeLink = document.createElement("a");
+    aboutMeLink.href = "https://x.com/@annedevj";
+    aboutMeLink.id = "about-me";
+    aboutMeLink.textContent = "by @annedevj";
+
+    this.sidebarContent.appendChild(aboutMeLink);
+    this.aboutMeLink = aboutMeLink;
+  }
+
   openActiveYear(monthDivs) {
     let activeSearchYear = null;
     const titleTag = document.querySelector("title");
@@ -400,7 +415,6 @@ class TimeMachine {
   }
 
   onPageChange() {
-    console.log("Page changed, resetting TimeMachine");
     this.reset();
   }
 
@@ -420,6 +434,10 @@ class TimeMachine {
       this.searchMonthsOptions.remove();
     }
     this.searchMonthsOptions = null;
+    if (this.aboutMeLink) {
+      this.aboutMeLink.remove();
+    }
+    this.aboutMeLink = null;
     this.addInfoToSidebar();
     this.toggleSidebar(); // Ensure sidebar visibility is updated
   }
