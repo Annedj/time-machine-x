@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Time Machine X",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Browse anyone's timeline and see their tweets from the past.",
   "host_permissions": ["https://twitter.com/*", "https://x.com/*"],
   "action": {
